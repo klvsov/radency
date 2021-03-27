@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { CSVReader } from 'react-papaparse';
 import Container from '@material-ui/core/Container';
@@ -16,6 +16,16 @@ const App = () => {
   const [loadError, setLoadError] = useState(false);
   const [isCSV, setIsCSV] = useState(false);
   const [startLoad, setStartLoad] = useState(false);
+
+  useEffect(() => {
+    let timerId;
+    if (loadError && isCSV && startLoad) {
+      timerId = setTimeout(closeAlert, 5000);
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [loadError, isCSV, startLoad]);
 
   const buttonRef = useRef(null);
 
