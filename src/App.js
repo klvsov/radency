@@ -29,6 +29,12 @@ const App = () => {
     }
   };
 
+  const closeAlert = () => {
+    setIsCSV(false);
+    setLoadError(false);
+    setStartLoad(false);
+  };
+
   let fileInsideError = '';
   if (!!users.length && !loadError && isCSV) {
     fileInsideError = users.find(
@@ -141,7 +147,7 @@ const App = () => {
       {!loadError && isCSV ? (
         !!users.length && <TableContent users={objUsers} />
       ) : (!isCSV && startLoad) || loadError ? (
-        <Alert severity="error" className="alert">
+        <Alert severity="error" className="alert" onClose={closeAlert}>
           File format is not correct!
         </Alert>
       ) : null}
