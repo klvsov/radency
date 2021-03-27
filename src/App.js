@@ -101,11 +101,13 @@ const App = () => {
         duplicates.push([i, emails.indexOf(tempEmail)]);
       }
       emails.push(tempEmail.toLowerCase());
+      return users;
     });
   }
   duplicates.map((el) => {
     objUsers[el[0]].duplicate = el[1];
     objUsers[el[1]].duplicate = el[0];
+    return objUsers;
   });
 
   return (
