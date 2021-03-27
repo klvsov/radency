@@ -14,6 +14,8 @@ const DATE_TEST_2 = /(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d/i;
 const App = () => {
   const [users, setUsers] = useState([]);
   const [loadError, setLoadError] = useState(false);
+  const [isCSV, setIsCSV] = useState(false);
+  const [startLoad, setStartLoad] = useState(false);
 
   const buttonRef = useRef(null);
 
@@ -27,18 +29,17 @@ const App = () => {
     }
   };
 
-  let isError = false;
-  if (!!users.length) {
-    users.map((el) => {
-      if (
+  let fileInsideError = '';
+  if (!!users.length && !loadError && isCSV) {
+    fileInsideError = users.find(
+      (el) =>
         el.data[0].trim() === '' ||
         el.data[1].trim() === '' ||
         el.data[2].trim() === ''
-      ) {
-        isError = true;
-      }
-      return users;
-    });
+    );
+    if (fileInsideError && !fileInsideError.length) {
+      setLoadError(true);
+    }
   }
 
   const objUsers = [];
@@ -46,7 +47,7 @@ const App = () => {
   const emails = [];
   const duplicates = [];
 
-  if (!!users.length) {
+  if (!!users.length && isCSV && !loadError) {
     users.map((el, i) => {
       objUsers.push({
         id: i,
@@ -116,9 +117,12 @@ const App = () => {
         ref={buttonRef}
         onFileLoad={(data, file) => {
           getUsers(data);
-          !file.length && !file.name.includes('csv', -3)
-            ? setLoadError(true)
-            : setLoadError(false);
+          setStartLoad(true);
+          if (file.name.slice(-3) !== 'csv') {
+            setIsCSV(false);
+          } else {
+            setIsCSV(true);
+          }
         }}
         onError={() => setLoadError(true)}
       >
@@ -134,13 +138,13 @@ const App = () => {
           </aside>
         )}
       </CSVReader>
-      {!loadError && !isError ? (
+      {!loadError && isCSV ? (
         !!users.length && <TableContent users={objUsers} />
-      ) : (
+      ) : (!isCSV && startLoad) || loadError ? (
         <Alert severity="error" className="alert">
           File format is not correct!
         </Alert>
-      )}
+      ) : null}
     </Container>
   );
 };
